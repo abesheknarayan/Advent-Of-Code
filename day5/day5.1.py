@@ -27,22 +27,16 @@ def mark(line,freq):
             ey = y1
         if sy > ey:
             step = [1,-1]
-            point = [sx,sy]
-            for i in range(sx,ex+1):
-                xx = point[0]
-                yy = point[1]
-                freq[yy][xx] += 1
-                point[0] += step[0]
-                point[1] += step[1]
+
         else :
             step = [1,1]
-            point = [sx,sy]
-            for i in range(sx,ex+1):
-                xx = point[0]
-                yy = point[1]
-                freq[yy][xx] += 1
-                point[0] += step[0]
-                point[1] += step[1]
+        point = [sx,sy]
+        for i in range(sx,ex+1):
+            xx = point[0]
+            yy = point[1]
+            freq[yy][xx] += 1
+            point[0] += step[0]
+            point[1] += step[1]
 
         
 fname = input()
@@ -57,15 +51,10 @@ for x in f:
     right = list(map(int,inp[1].split(' ')[1].split(',')))
     maxx = max(maxx,left[0],right[0])
     maxy = max(maxy,left[1],right[1])
-    line = []
-    line.append(left)
-    line.append(right)
-    lines.append(line)
+    lines.append([left,right])
 n = len(lines)
-print(n,maxx,maxy)
 freq = [[0 for i in range(maxy+1)]for j in range(maxx+1)]
 for line in lines:
-    print(line)
     mark(line,freq)
 
 res = 0
