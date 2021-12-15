@@ -1,16 +1,16 @@
 # Advent of Code 21
 
-Cuz I'm bored :/
+Code for all the Advent of Code'21 challenges mostly written in python.
 
-Bad code cuz its a timed contest !
+Some challenges have 2 files where continuation of the problem is significantly different
 
-- Running python script
+### Running python script
 ```bash
-python3 file.py
+python3 ${filename}.py
 ```
-- Running awk script
+### Running awk script
 ```bash
-awk -f script.awk input.txt
+awk -f ${filename}.awk ${input}.txt
 ```
 
 TODO:

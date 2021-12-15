@@ -2,4 +2,4 @@
 
 mkdir $1
 cd $1
-touch sample.txt input.txt
+touch sample.txt input.txt $1.py

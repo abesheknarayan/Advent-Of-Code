@@ -46,9 +46,9 @@ maxx = 0
 maxy = 0
 for x in f:
     inp = x.split('\n')[0]
-    inp = inp.split("->")
-    left = list(map(int,inp[0].split(' ')[0].split(',')))
-    right = list(map(int,inp[1].split(' ')[1].split(',')))
+    inp = inp.split(" -> ")
+    left = list(map(int,inp[0].split(',')))
+    right = list(map(int,inp[1].split(',')))
     maxx = max(maxx,left[0],right[0])
     maxy = max(maxy,left[1],right[1])
     lines.append([left,right])
