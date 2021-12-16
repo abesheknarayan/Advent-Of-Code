@@ -2,7 +2,7 @@ from queue import PriorityQueue
 
 fname = input()
 f = open(fname+".txt")
-inp = [] 
+inp = []
 for line in f:
     line = line.split("\n")[0]
     line = list(map(int,line))
@@ -35,7 +35,6 @@ inf = 10**9
 q = PriorityQueue()
 dp = [[inf for _ in range(n)] for _ in range(n)]
 dp[0][0] = 0
-
 dx = [0,0,1,-1]
 dy = [1,-1,0,0]
 

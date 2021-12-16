@@ -1,6 +1,6 @@
 # Advent of Code 21
 
-Code for all the Advent of Code'21 challenges mostly written in python.
+Code for all the Advent of Code'21 challenges mostly written in python. They are not necessarily the best or fastest solutions but just the unmodified versions of what I wrote during the contest itself.
 
 Some challenges have 2 files where continuation of the problem is significantly different
 
@@ -12,6 +12,3 @@ python3 ${filename}.py
 ```bash
 awk -f ${filename}.awk ${input}.txt
 ```
-
-TODO:
-- Cleanup at the end using lambdas and stuff
