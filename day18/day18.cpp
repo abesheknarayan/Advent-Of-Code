@@ -57,7 +57,7 @@ void addDepth(node *node, int val)
     }
 }
 
-// returns false if there is node with depth >= 6 or val >= 10
+// returns false if there is node with depth >= 4 or val >= 10
 bool check(node *node)
 {
     if ((node->val == -1 && node->depth >= 4) || node->val >= 10)
@@ -242,7 +242,7 @@ node *findValueNode(node *nownode)
 
 void relax(node *nownode)
 {
-    // first check for depth 6
+    // first check for depth 4
     node *depnode = findDepthNode(nownode);
     if (depnode)
     {
