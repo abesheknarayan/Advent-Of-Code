@@ -3,58 +3,38 @@ f = open(fname+".txt")
 p1 = int(f.readline().split("\n")[0].split(" ")[-1])
 p2 = int(f.readline().split("\n")[0].split(" ")[-1])
 
-dp = {}
-dp[tuple([p1,p2,0,0])] = 1
-q = []
-q.append([p1,p2,0,0,0]) # p1 , p2 , s1 , s2 , turn
-sum1 = 0
-sum2 = 0
-# while len(q) > 0:
-#     top = q.pop(-1)
-#     # print(sum1,sum2)
-#     no = dp[tuple([top[0],top[1],top[2],top[3]])]
-#     if top[2] >= 21:
-#         sum1 += no
-#         continue
-#     elif top[3] >= 21:
-#         sum2 += no
-#         continue
-#     for i in range(1,4):
-#         for j in range(1,4):
-#             for k in range(1,4):
-#                 turn = 1 - top[4]
-#                 if top[4] == 0:
-#                     nxt = (i + j + k + top[0])%10
-#                     if nxt == 0:
-#                         nxt = 10
-#                     q.append([nxt,top[1],top[2]+nxt,top[3],turn])
-#                     tup = tuple([nxt,top[1],top[2]+nxt,top[3]])
-#                     if dp.__contains__(tup):
-#                         dp[tup] += no
-#                     else:
-#                         dp[tup] = no
-#                 else:
-#                     nxt = (i + j + k + top[1])%10
-#                     if nxt == 0:
-#                         nxt = 10
-#                     q.append([top[0],nxt,top[2],top[3]+nxt,turn])
-#                     tup = tuple([top[0],nxt,top[2],top[3]+nxt])
-#                     if dp.__contains__(tup):
-#                         dp[tup] += no
-#                     else:
-#                         dp[tup] = no
+# we have this tree kindof structure with each node having 3 children (universes)
+# should do some recursion stuff
+# assuming each player still rolls the dice 3 times
 
-def recurse(tup):
-    ...
-    for i in range(1,4):
-        for j in range(1,4):
-            for k in range(1,4):
-                if tup[4] == 0:
-                    ...
-                    
-                else:
-                    ...
+ways = {}
+# (current_p1, current_p2, turn , score_p1 , score_p2): number of ways to that state
 
+c = [x+y+z for x in [1,2,3] for y in [1,2,3] for z in [1,2,3]]
 
-recurse((p1,p2,0,0,0))
-print(max(sum1,sum2))
+# given initial starting state as parameter, this function returns a list of 2 numbers --> the number of ways in which p1,p2 can win
+def go(p1_x,p2_x,turn,p1_s = 0,p2_s = 0):
+    tup = (p1_x,p2_x,turn,p1_s,p2_s)
+    if tup in ways:
+        return ways[tup]
+    res = [0,0]
+    for now in c:
+        if turn == 0:
+            newp1_x = (now + p1_x - 1) % 10 + 1
+            newp1_s = p1_s + newp1_x
+            if newp1_s >= 21:
+                res[0] += 1
+            else:
+                tans = go(newp1_x,p2_x,1-turn,newp1_s,p2_s)
+                res = [a+b for a,b in zip(res,tans)]
+        else:
+            newp2_x = (now + p2_x - 1) % 10 + 1
+            newp2_s = p2_s + newp2_x
+            if newp2_s >= 21:
+                res[1] += 1
+            else:
+                tans = go(p1_x,newp2_x,1-turn,p1_s,newp2_s)
+                res = [a+b for a,b in zip(res,tans)]
+    ways[tup] = res
+    return res
+print(max(go(p1,p2,0)))
