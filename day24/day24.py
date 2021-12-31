@@ -11,7 +11,8 @@ def resolveVariableName(name):
 for line in f:
     line = line.split("\n")[0]
     if line.__contains__("inp w"):
-        comm.append(temp)
+        if len(temp) > 0:
+            comm.append(temp)
         temp = []
     else:
         line = line.split(" ")
@@ -22,124 +23,82 @@ for line in f:
 if len(temp) > 0:
     comm.append(temp)
 
+# This is a special program, the below code only works for the input ALU not for a generalized ALU
+# For generalized ALU it will take 9^14 computations 
 
-def loadValue(x,vals):
-    return vals[x]
-def setValue(x,vals,val):
-    vals[x] = val
-    return vals
+# Each block, C's are constants
+# Initial State = (x,y,z) | (0,0,0)
+# input w (0-9)
+# x = z % 26
+# if z_truncate:
+#   z = z // 26
+# if (z % 26) + C0 != input:
+#   z = z * 26 + C3 + input
+#   y = input + C3
+# else:
+#   x = 0
+#   y = 0
 
-def getTupleZ(val):
-    return tuple([val//26,val%26])
-    
-def getAdd(c1,c2,c3,vals):
-    a = loadValue(c2,vals)
-    if c1 == 1:
-        b = loadValue(c3,vals)
-    else:
-        b = c3
-    if c2 == 3 and c1 == 1:
-        a = getTupleZ((a[0]*26+a[1])+b)
-    elif c3 == 3 and c1 == 1:
-        a = a + b[1]
-    else:
-        a = a + b
-    vals = setValue(c2,vals,a)
-    return vals
+# C0 - line 4 always greater than 10 whenever z_truncate is false !!!!!
+# C1 - line 8 (always 25)
+# C2 - line 10 (always 1)
+# C3 - line 14
 
-def getMul(c1,c2,c3,vals):
-    a = loadValue(c2,vals)
-    if c1 == 1:
-        b = loadValue(c3,vals)
-    else:
-        b = c3
-    if c2 == 3:
-        a = getTupleZ((a[0]*26+a[1])*b)
-    else:
-        a = a * b
-    vals = setValue(c2,vals,a)
-    return vals
-
-def getDiv(c1,c2,c3,vals):
-    a = loadValue(c2,vals)
-    if c1 == 1:
-        b = loadValue(c3,vals)
-    else:
-        b = c3
-    if c2 == 3:
-        if b == 1:
-            ...
-        elif b == 26:
-            ...
-            a = getTupleZ(a[0])
-    else:        
-        a = a // b
-    vals = setValue(c2,vals,a)
-    return vals
-
-def getMod(c1,c2,c3,vals):
-    a = loadValue(c2,vals)
-    if c1 == 1:
-        b = loadValue(c3,vals)
-    else:
-        b = c3
-    a = a % b
-    vals = setValue(c2,vals,a)
-    return vals
-
-def getEql(c1,c2,c3,vals):
-    a = loadValue(c2,vals)
-    if c1 == 1:
-        b = loadValue(c3,vals)
-    else:
-        b = c3
-    if a == b:
-        a = 1
-    else:
-        a = 0
-    vals = setValue(c2,vals,a)
-    return vals
-
-# find the largest digit we can get from the list of sequential commands
-def findLargestDigit(com,prevState):
-    res = set()
-    tupleMap = {}
-    for state in prevState:
-        prevRes = state[0]
-        for i in range(1,10):
-            vals = list(state[1])
-            vals[0] = i
-            for c in com:
-                if c[0] == 'add':
-                    vals = getAdd(c[1],c[2],c[3],vals)
-                elif c[0] == 'mul':
-                    vals = getMul(c[1],c[2],c[3],vals)    
-                elif c[0] == 'div':
-                    vals = getDiv(c[1],c[2],c[3],vals)     
-                elif c[0] == 'mod':
-                    vals = getMod(c[1],c[2],c[3],vals)     
-                elif c[0] == 'eql':
-                    vals = getEql(c[1],c[2],c[3],vals)
-            nowRes = prevRes*10 + i
-            valss = tuple(vals)
-            if tupleMap.__contains__(valss) == False:
-                tupleMap[valss] = nowRes
-            else:
-                tupleMap[valss] = max(tupleMap[valss],nowRes)
-
-    for t in tupleMap:
-        res.add(tuple([tupleMap[t],t]))
-    return res
-
-comm.pop(0)
-prevState = set()
-prevState.add(tuple([0,tuple([0,0,0,tuple([0,0])])]))
+class Chunk:
+    def __init__(self, z_truncate, x_incr, y_incr) -> None:
+        self.z_truncate = z_truncate
+        self.x_incr = x_incr
+        self.y_incr = y_incr
+    def printChunk(self):
+        print("[Truncate]:",self.z_truncate,"[x_incr]:",self.x_incr,"[y_incr]:",self.y_incr)
+chunks = []
 for com in comm:
-    print(len(prevState))
-    prevState = findLargestDigit(com,prevState)
+    z_truncate = False
+    if com[3][3] == 26:
+        z_truncate = True
+    chunks.append(Chunk(z_truncate,com[4][3],com[14][3]))
 
-res = 0
-for state in prevState:
-    if state[1][3] == tuple([0,0]):       
-        res = max(res,state[0])
-print(res)
+# If Truncate is False, TempVariable =  input + y_incr
+# Else input = x_incr + lastUsedTempVariable
+
+program = []
+variableStack = []
+variableNo = -1
+for idx,chunk in enumerate(chunks):
+    if chunk.z_truncate == False:
+        variableNo += 1
+        varName = chr(ord('A')+variableNo)
+        inpName = 'i' + str(idx)
+        variableStack.append(varName)
+        op = ' + '
+        if chunk.y_incr < 0:
+            op = ' ' 
+        line = [varName,' = ',inpName,op,chunk.y_incr]
+        program.append(line)
+    else:
+        varName = variableStack.pop()
+        inpName = 'i' + str(idx)
+        op = ' + '
+        if chunk.x_incr < 0:
+            op = ' '
+        line = [inpName,' = ',varName,op,chunk.x_incr]     
+        program.append(line)
+
+for line in program:
+    for c in line:
+        print(c,end='')
+    print("")
+
+## final optimized ALU
+# i3 = i2+5
+# i5 = i4-3
+# i7 = i6+7
+# i10 = i9-1
+# i11 = i8+3
+# i12 = i1+6
+# i13 = i0
+# independent i0,i1,i2,i4,i6,i8,i9
+# by hand Answer
+# index 0| 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13
+# Max   9| 3 | 4 | 9 | 9 | 6 | 2 | 9 | 6 | 9 | 8  | 9  | 9  | 9 
+# Min   1| 1 | 1 | 6 | 4 | 1 | 1 | 8 | 1 | 2 | 1  | 4  | 7  | 1
