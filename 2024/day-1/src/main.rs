@@ -8,7 +8,7 @@ fn main() {
 
     let mut first_list: Vec<i32> = Vec::new();
     let mut second_list: Vec<i32> = Vec::new();
-    
+
     // reading a file line by line with 2 numbers in each line
     for line in reader.lines() {
         let line = line.unwrap();
@@ -22,26 +22,25 @@ fn main() {
     // part_1(&mut first_list, &mut second_list);
 
     part_2(&mut first_list, &mut second_list);
-
 }
 
 fn part_1(first_list: &mut Vec<i32>, second_list: &mut Vec<i32>) {
-        // sort both list
-        first_list.sort();
-        second_list.sort();
-    
-        let mut result: i32 = 0;
-    
-        for (x,y) in first_list.iter().zip(second_list.iter()) {
-            result += (x-y).abs();
-        }
-    
-        println!("Result: {result}");   
+    // sort both list
+    first_list.sort();
+    second_list.sort();
+
+    let mut result: i32 = 0;
+
+    for (x, y) in first_list.iter().zip(second_list.iter()) {
+        result += (x - y).abs();
+    }
+
+    println!("Result: {result}");
 }
 
 fn part_2(first_list: &mut Vec<i32>, second_list: &mut Vec<i32>) {
     // Hashmap to keep the count from second_list
-    let mut counts: HashMap<i32,i32> = HashMap::new();
+    let mut counts: HashMap<i32, i32> = HashMap::new();
     for x in second_list {
         *counts.entry(*x).or_insert(0) += 1;
     }
