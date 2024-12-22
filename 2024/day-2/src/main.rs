@@ -42,7 +42,7 @@ fn part_2() {
 
         let safe: bool = is_safe(&vec);
         if !safe {
-            for i in 0..vec.len(){
+            for i in 0..vec.len() {
                 let mut new_vec: Vec<i32> = vec.clone();
                 new_vec.remove(i);
 
